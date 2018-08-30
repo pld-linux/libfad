@@ -1,0 +1,103 @@
+--- libfad-0.9.6/src/Makefile.orig	2006-09-19 17:46:49.000000000 +0200
++++ libfad-0.9.6/src/Makefile	2018-08-30 18:09:21.536283300 +0200
+@@ -5,60 +5,6 @@
+ 		 fad.fontext.o fad.frame.o fad.jpeg.o fad.shape.o fad.morph.o \
+ 		 fad.sound.o fad.sprite.o fad.stream.o fad.utils.o fad.render.o
+ 
+-ZLIB_SUBDIR=zlib
+-JPEG_SUBDIR=jpeg
+-LIBMAD_SUBDIR=libmad
+-
+-ZLIB_OBJS=$(ZLIB_SUBDIR)/adler32.o \
+-					$(ZLIB_SUBDIR)/crc32.o \
+-					$(ZLIB_SUBDIR)/zutil.o \
+-					$(ZLIB_SUBDIR)/trees.o \
+-					$(ZLIB_SUBDIR)/inffast.o \
+-					$(ZLIB_SUBDIR)/inftrees.o \
+-					$(ZLIB_SUBDIR)/infback.o \
+-					$(ZLIB_SUBDIR)/inflate.o \
+-					$(ZLIB_SUBDIR)/uncompr.o
+-
+-
+-JPEG_OBJS=$(JPEG_SUBDIR)/jdapistd.o \
+-					$(JPEG_SUBDIR)/jdcolor.o \
+-					$(JPEG_SUBDIR)/jdcoefct.o \
+-					$(JPEG_SUBDIR)/jdatasrc.o \
+-					$(JPEG_SUBDIR)/jddctmgr.o \
+-					$(JPEG_SUBDIR)/jdmarker.o \
+-					$(JPEG_SUBDIR)/jdpostct.o \
+-					$(JPEG_SUBDIR)/jdinput.o \
+-					$(JPEG_SUBDIR)/jidctred.o \
+-					$(JPEG_SUBDIR)/jdhuff.o \
+-					$(JPEG_SUBDIR)/jdphuff.o \
+-					$(JPEG_SUBDIR)/jidctflt.o \
+-					$(JPEG_SUBDIR)/jutils.o \
+-					$(JPEG_SUBDIR)/jidctfst.o \
+-					$(JPEG_SUBDIR)/jcomapi.o \
+-					$(JPEG_SUBDIR)/jquant1.o \
+-					$(JPEG_SUBDIR)/jquant2.o \
+-					$(JPEG_SUBDIR)/jdapimin.o \
+-					$(JPEG_SUBDIR)/jidctint.o \
+-					$(JPEG_SUBDIR)/jmemmgr.o \
+-					$(JPEG_SUBDIR)/jmemname.o \
+-					$(JPEG_SUBDIR)/jdmaster.o \
+-					$(JPEG_SUBDIR)/jdsample.o \
+-					$(JPEG_SUBDIR)/jdtrans.o \
+-					$(JPEG_SUBDIR)/jdmainct.o \
+-					$(JPEG_SUBDIR)/jdatadst.o \
+-					$(JPEG_SUBDIR)/jdmerge.o \
+-					$(JPEG_SUBDIR)/jerror.o
+-
+-LIBMAD_OBJS=$(LIBMAD_SUBDIR)/bit.o \
+-						$(LIBMAD_SUBDIR)/fixed.o \
+-						$(LIBMAD_SUBDIR)/frame.o \
+-						$(LIBMAD_SUBDIR)/huffman.o \
+-						$(LIBMAD_SUBDIR)/layer12.o \
+-						$(LIBMAD_SUBDIR)/layer3.o \
+-						$(LIBMAD_SUBDIR)/stream.o \
+-						$(LIBMAD_SUBDIR)/synth.o \
+-						$(LIBMAD_SUBDIR)/timer.o
+-
+ LIBMAD_CFLAGS=-DFPM_INTEL
+ 
+ DEBUG=-g -DLIBFAD_DO_RENDER #-DLIBFAD_DEBUG # -DLIBFAD_DEBUG # -DLIBFAD_DEBUG
+@@ -75,32 +21,22 @@
+ 
+ SHAREDLIBV=libfad.so.$(VER)
+ 
+-all:$(SHAREDLIBV)
++all:$(SHAREDLIBV) $(STATICLIB)
+ 	-@if [ ! -f $(SHAREDLIB) ]; then ln -s $(SHAREDLIBV) $(SHAREDLIB); fi
+ 	-@if [ ! -f $(SHAREDLIBM) ]; then ln -s $(SHAREDLIBV) $(SHAREDLIBM); fi
+ 
+-$(SHAREDLIBV): $(ZLIB_OBJS) $(JPEG_OBJS) $(LIBMAD_OBJS) $(OBJS)
+-	$(CC) $(LDFLAGS) -o $(SHAREDLIBV) $(OBJS) $(JPEG_OBJS) $(ZLIB_OBJS) $(LIBMAD_OBJS)
+-#	$(AR) -r $(STATICLIB) $(OBJS) $(JPEG_OBJS) $(ZLIB_OBJS)
++$(SHAREDLIBV): $(OBJS)
++	$(CC) $(LDFLAGS) -o $(SHAREDLIBV) $(OBJS) -ljpeg -lz -lmad
++
++$(STATICLIB): $(OBJS)
++	$(AR) -r $(STATICLIB) $(OBJS)
+ 
+ #compile libFAD source code
+ fad.%.o: fad.%.c
+ 	$(CC) $(CFLAGS) -c $< -o $@
+ 
+-#compile ZLIB source code
+-$(ZLIB_SUBDIR)/%.o: $(ZLIB_SUBDIR)/%.c
+-	$(CC) -c $< -o $@
+-
+-#compile JPEG source code
+-$(JPEG_SUBDIR)/%.o: $(JPEG_SUBDIR)/%.c
+-	$(CC) -c $< -o $@
+-
+-#compile libmad source code
+-$(LIBMAD_SUBDIR)/%.o: $(LIBMAD_SUBDIR)/%.c
+-	$(CC) $(LIBMAD_CFLAGS) -c $< -o $@
+-
+ clean:
+-	rm $(OBJS) $(ZLIB_OBJS) $(JPEG_OBJS) $(LIBMAD_OBJS) *.txt *.bak *.copy $(SHAREDLIBM) $(SHAREDLIBV) $(SHAREDLIB) $(STATICLIB) -f
++	rm $(OBJS) *.txt *.bak *.copy $(SHAREDLIBM) $(SHAREDLIBV) $(SHAREDLIB) $(STATICLIB) -f
+ 
+ install: $(SHAREDLIBV)
+ 	-@if [ ! -d $(PREFIX)/include ]; then mkdir -p $(PREFIX)/include; fi

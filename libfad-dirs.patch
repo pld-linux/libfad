@@ -1,0 +1,61 @@
+--- libfad-0.9.6/src/Makefile.orig	2018-08-30 18:18:26.332943742 +0200
++++ libfad-0.9.6/src/Makefile	2018-08-30 18:24:06.672939854 +0200
+@@ -1,5 +1,8 @@
+ VER=0.9.6
++DESTDIR=
+ PREFIX=/usr/local
++INCLUDEDIR=$(PREFIX)/include
++LIBDIR=$(PREFIX)/lib
+ 
+ OBJS=fad.bitmap.o fad.bits.o fad.button.o fad.dl.o fad.dynarray.o \
+ 		 fad.fontext.o fad.frame.o fad.jpeg.o fad.shape.o fad.morph.o \
+@@ -39,17 +42,17 @@
+ 	rm $(OBJS) *.txt *.bak *.copy $(SHAREDLIBM) $(SHAREDLIBV) $(SHAREDLIB) $(STATICLIB) -f
+ 
+ install: $(SHAREDLIBV)
+-	-@if [ ! -d $(PREFIX)/include ]; then mkdir -p $(PREFIX)/include; fi
+-	-@if [ ! -d $(PREFIX)/lib ]; then mkdir -p $(PREFIX)/lib; fi
+-	cp fad.h $(PREFIX)/include
+-	cp $(SHAREDLIBV) $(PREFIX)/lib
+-	-@if [ ! -f $(SHAREDLIB) ]; then \
+-	cd $(PREFIX)/lib; \
++	-@if [ ! -d $(DESTDIR)$(INCLUDEDIR) ]; then mkdir -p $(DESTDIR)$(PREFIX)/include; fi
++	-@if [ ! -d $(DESTDIR)$(LIBDIR) ]; then mkdir -p $(DESTDIR)$(LIBDIR); fi
++	cp fad.h $(DESTDIR)$(INCLUDEDIR)
++	cp $(SHAREDLIBV) $(STATICLIB) $(DESTDIR)$(LIBDIR)
++	-@if [ ! -f $(DESTDIR)$(LIBDIR)$(SHAREDLIB) ]; then \
++	cd $(DESTDIR)$(LIBDIR); \
+ 		ln -s $(SHAREDLIBV) $(SHAREDLIB); \
+ 		ln -s $(SHAREDLIBV) $(SHAREDLIBM); \
+ 	fi
+ 
+ uninstall:
+-	rm $(PREFIX)/include/fad.h \
+-	cd $(PREFIX)/lib; \
+-	rm $(SHAREDLIBV) $(SHAREDLIB) $(SHAREDLIBM)
++	rm $(DESTDIR)$(INCLUDEDIR)/fad.h \
++	cd $(DESTDIR)$(LIBDIR); \
++	rm $(SHAREDLIBV) $(SHAREDLIB) $(SHAREDLIBM) $(STATICLIB)
+--- libfad-0.9.6/player/Makefile.orig	2006-09-12 22:06:23.000000000 +0200
++++ libfad-0.9.6/player/Makefile	2018-08-30 18:37:48.349597141 +0200
+@@ -1,3 +1,7 @@
++DESTDIR=
++PREFIX=/usr/local
++BINDIR=$(PREFIX)/bin
++
+ PLAYER=fap
+ 
+ #DEBUG_CFLAGS= -g
+@@ -35,9 +39,9 @@
+ 	rm fap *.o *.txt *.bak *.out .svn/ -rf
+ 
+ install: $(SHAREDLIBV)
+-	-@if [ ! -d $(PREFIX)/bin ]; then mkdir -p $(PREFIX)/bin; fi
+-	cp fap $(PREFIX)/bin
++	-@if [ ! -d $(DESTDIR)$(BINDIR) ]; then mkdir -p $(DESTDIR)$(BINDIR); fi
++	cp fap $(DESTDIR)$(BINDIR)
+ 
+ uninstall:
+-	cd $(PREFIX)/bin; \
++	cd $(DESTDIR)$(BINDIR); \
+ 	rm fap
